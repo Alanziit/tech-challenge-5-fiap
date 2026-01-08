@@ -1,8 +1,10 @@
 
 import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Kanban from './components/Kanban';
 import Pomodoro from './components/Pomodoro';
+import Login from './components/Login';
 
 
 export default function App(){
@@ -14,8 +16,6 @@ export default function App(){
   const [dyslexiaMode,setDyslexiaMode]=useState(false);
 
   const [profile,setProfile]=useState<'normal'|'tea'|'dyslexia'>('normal');
-
-  const [page,setPage]=useState<'home'|'profile'>('home');
 
   useEffect(()=>{
     const saved=localStorage.getItem('prefs');
@@ -33,31 +33,39 @@ export default function App(){
   },[focusMode,contrast,spacing,fontSize]);
 
   return(
-    <div className={`app 
-      ${focusMode ? 'focus' : ''} 
-      ${teaMode ? 'tea' : ''} 
-      ${dyslexiaMode ? 'dyslexia' : ''} 
-      ${contrast === 'high' ? 'contrast' : ''} 
-      ${spacing} 
-      ${fontSize}`}
+    <BrowserRouter>
+      <div className={`app 
+        ${focusMode ? 'focus' : ''} 
+        ${teaMode ? 'tea' : ''} 
+        ${dyslexiaMode ? 'dyslexia' : ''} 
+        ${contrast === 'high' ? 'contrast' : ''} 
+        ${spacing} 
+        ${fontSize}`}
 >
-      <Dashboard
-        focus={focusMode}
-        onFocusToggle={()=>setFocusMode(!focusMode)}
-        onContrast={()=>setContrast(contrast==='normal'?'high':'normal')}
-        spacing={spacing}
-        setSpacing={setSpacing}
-        fontSize={fontSize}
-        setFontSize={setFontSize}
-        tea={teaMode}
-        onTea={()=>{ setTeaMode(!teaMode); if(!teaMode) setDyslexiaMode(false); }}
-        dyslexia={dyslexiaMode}
-        onDyslexia={()=>{ setDyslexiaMode(!dyslexiaMode); if(!dyslexiaMode) setTeaMode(false); }}
-      />
-      {page==='home' && <>
-        <Pomodoro/>
-        <Kanban/>
-      </>}
-    </div>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/home" element={
+            <>
+              <Dashboard
+                focus={focusMode}
+                onFocusToggle={()=>setFocusMode(!focusMode)}
+                onContrast={()=>setContrast(contrast==='normal'?'high':'normal')}
+                spacing={spacing}
+                setSpacing={setSpacing}
+                fontSize={fontSize}
+                setFontSize={setFontSize}
+                tea={teaMode}
+                onTea={()=>{ setTeaMode(!teaMode); if(!teaMode) setDyslexiaMode(false); }}
+                dyslexia={dyslexiaMode}
+                onDyslexia={()=>{ setDyslexiaMode(!dyslexiaMode); if(!dyslexiaMode) setTeaMode(false); }}
+              />
+              <Pomodoro/>
+              <Kanban/>
+            </>
+          } />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
