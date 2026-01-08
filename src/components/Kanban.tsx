@@ -16,12 +16,9 @@ export default function Kanban() {
   const [deleteModal,setDeleteModal]=useState<{col:keyof Tasks,index:number}|null>(null);
   const [confirmDone,setConfirmDone]=useState<{col:keyof Tasks,index:number}|null>(null);
 
-  const [tasks, setTasks] = useState<Tasks>({
-    todo: [],
-    doing: [],
-    done: []
-  });
+  const [globalInputAlert, setGlobalInputAlert] = useState(false);
 
+  const globalInputTimer = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const timerRef = useRef<any>(null);
 
@@ -49,6 +46,49 @@ export default function Kanban() {
     return () => clearTimeout(timerRef.current);
   }, []);
 
+  /* ===============================
+     GLOBAL INPUT COGNITIVE ALERT
+  =============================== */
+  useEffect(() => {
+    function startGlobalTimer() {
+      clearTimeout(globalInputTimer.current);
+      globalInputTimer.current = setTimeout(() => {
+        setGlobalInputAlert(true);
+      }, 5000);
+    }
+
+    function clearGlobalTimer() {
+      clearTimeout(globalInputTimer.current);
+    }
+
+    function handleFocusIn(e: Event) {
+      const target = e.target as HTMLElement;
+      if (target && target.tagName === 'INPUT') {
+        startGlobalTimer();
+      }
+    }
+
+    function handleInput() {
+      startGlobalTimer();
+    }
+
+    function handleFocusOut() {
+      clearGlobalTimer();
+    }
+
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('input', handleInput);
+    document.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      clearGlobalTimer();
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('input', handleInput);
+      document.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
+  /* =============================== */
+
   function addTask() {
     if(!newTask.trim()) {
       setInputError(true);
@@ -63,6 +103,12 @@ export default function Kanban() {
     setNewTask('');
     setInputError(false);
   }
+
+  const [tasks, setTasks] = useState<Tasks>({
+    todo: [],
+    doing: [],
+    done: []
+  });
 
   function confirmDelete(){
     if(!deleteModal) return;
@@ -106,24 +152,22 @@ export default function Kanban() {
 
   function onDrop(e: React.DragEvent<HTMLDivElement>, target: keyof Tasks) {
     const raw = e.dataTransfer.getData('source');
-  
-
     if (!raw) return;
-  
+
     const data = JSON.parse(raw);
     if (!data) return;
-  
+
     if (target === 'done') {
       setConfirmDone({ col: data.column, index: data.index });
       return;
     }
-  
+
     const updated = structuredClone(tasks);
     const item = updated[data.column][data.index];
-  
+
     updated[data.column].splice(data.index, 1);
     updated[target].push(item);
-  
+
     setTasks(updated);
   }
 
@@ -151,6 +195,47 @@ export default function Kanban() {
 
   return (
     <section className="kanban">
+
+      {showAlert && (
+        <div className="modal-overlay" onClick={resetAlertAndRestart}>
+          <div className="modal" onClick={(e)=>e.stopPropagation()}>
+            <h2>⚠️ Pausa Cognitiva</h2>
+            <p>Você está há bastante tempo parado nesta ação. Que tal respirar um pouco?</p>
+            <button className="btn primary" onClick={resetAlertAndRestart}>
+              Continuar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {globalInputAlert && (
+        <div className="modal-overlay" onClick={() => setGlobalInputAlert(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>Alerta Cognitivo</h3>
+            <p>
+              Você está há algum tempo nesta tarefa sem interação.
+              <br />
+              Que tal fazer uma pequena pausa?
+            </p>
+            <button className="btn primary" onClick={() => setGlobalInputAlert(false)}>
+              Continuar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {deleteModal && (
+        <div className="modal-overlay" onClick={()=>setDeleteModal(null)}>
+          <div className="modal" onClick={(e)=>e.stopPropagation()}>
+            <h3>Excluir tarefa?</h3>
+            <p>Tem certeza que deseja excluir esta tarefa?</p>
+            <div style={{display:"flex",gap:"10px"}}>
+              <button className="btn danger" onClick={confirmDelete}>Sim</button>
+              <button className="btn secondary" onClick={()=>setDeleteModal(null)}>Não</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {confirmDone && (
         <div className="modal-overlay" onClick={()=>setConfirmDone(null)}>
@@ -195,7 +280,7 @@ export default function Kanban() {
 
             {list.map((task, i) => (
               <div
-              className={`card ${key === 'done' ? 'done' : ''}`}
+                className={`card ${key === 'done' ? 'done' : ''}`}
                 key={i}
                 draggable={key !== 'done'}
                 onDragStart={(e) => onDragStart(e, typedKey, i)}
@@ -234,7 +319,12 @@ export default function Kanban() {
                     <ul className="checklist">
                       {task.checklist.map((c,ci)=>(
                         <li key={ci}>
-                          <input className='check' type="checkbox" checked={c.done} onChange={()=>toggleChecklist(typedKey,i,ci)} />
+                          <input
+                            className="check"
+                            type="checkbox"
+                            checked={c.done}
+                            onChange={()=>toggleChecklist(typedKey,i,ci)}
+                          />
                           {c.text}
                         </li>
                       ))}
