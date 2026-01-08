@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Dashboard from './components/Dashboard';
 import Kanban from './components/Kanban';
 import Pomodoro from './components/Pomodoro';
-import Profile from './pages/Profile';
+
 
 export default function App(){
   const [focusMode,setFocusMode]=useState(false);
@@ -58,7 +58,6 @@ export default function App(){
         <Pomodoro/>
         <Kanban/>
       </>}
-      {page==='profile' && <Profile/>}
     </div>
   );
 }

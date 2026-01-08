@@ -1,8 +1,8 @@
-
 import { useEffect, useRef, useState } from 'react';
+import confetti from 'canvas-confetti';
 
 type ChecklistItem = { text:string; done:boolean };
-type TaskType = { text:string; checklist:ChecklistItem[], adding?:boolean };
+type TaskType = { text:string; checklist:ChecklistItem[]; adding?:boolean };
 type Tasks = {
   todo: TaskType[];
   doing: TaskType[];
@@ -14,13 +14,11 @@ export default function Kanban() {
   const [showAlert, setShowAlert] = useState(false);
   const [inputError,setInputError] = useState(false);
   const [deleteModal,setDeleteModal]=useState<{col:keyof Tasks,index:number}|null>(null);
+  const [confirmDone,setConfirmDone]=useState<{col:keyof Tasks,index:number}|null>(null);
 
-  const [tasks, setTasks] = useState<Tasks>({
-    todo: [],
-    doing: [],
-    done: []
-  });
+  const [globalInputAlert, setGlobalInputAlert] = useState(false);
 
+  const globalInputTimer = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const timerRef = useRef<any>(null);
 
@@ -48,6 +46,49 @@ export default function Kanban() {
     return () => clearTimeout(timerRef.current);
   }, []);
 
+  /* ===============================
+     GLOBAL INPUT COGNITIVE ALERT
+  =============================== */
+  useEffect(() => {
+    function startGlobalTimer() {
+      clearTimeout(globalInputTimer.current);
+      globalInputTimer.current = setTimeout(() => {
+        setGlobalInputAlert(true);
+      }, 5000);
+    }
+
+    function clearGlobalTimer() {
+      clearTimeout(globalInputTimer.current);
+    }
+
+    function handleFocusIn(e: Event) {
+      const target = e.target as HTMLElement;
+      if (target && target.tagName === 'INPUT') {
+        startGlobalTimer();
+      }
+    }
+
+    function handleInput() {
+      startGlobalTimer();
+    }
+
+    function handleFocusOut() {
+      clearGlobalTimer();
+    }
+
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('input', handleInput);
+    document.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      clearGlobalTimer();
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('input', handleInput);
+      document.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
+  /* =============================== */
+
   function addTask() {
     if(!newTask.trim()) {
       setInputError(true);
@@ -63,14 +104,16 @@ export default function Kanban() {
     setInputError(false);
   }
 
+  const [tasks, setTasks] = useState<Tasks>({
+    todo: [],
+    doing: [],
+    done: []
+  });
+
   function confirmDelete(){
     if(!deleteModal) return;
     const {col,index}=deleteModal;
-    const updated:Tasks={
-      todo:[...tasks.todo],
-      doing:[...tasks.doing],
-      done:[...tasks.done]
-    };
+    const updated = structuredClone(tasks);
     updated[col].splice(index,1);
     setTasks(updated);
     setDeleteModal(null);
@@ -108,21 +151,46 @@ export default function Kanban() {
   }
 
   function onDrop(e: React.DragEvent<HTMLDivElement>, target: keyof Tasks) {
-    const data = JSON.parse(e.dataTransfer.getData('source'));
+    const raw = e.dataTransfer.getData('source');
+    if (!raw) return;
+
+    const data = JSON.parse(raw);
     if (!data) return;
 
-    const item = tasks[data.column][data.index];
+    if (target === 'done') {
+      setConfirmDone({ col: data.column, index: data.index });
+      return;
+    }
 
-    const updated:Tasks = {
-      todo:[...tasks.todo],
-      doing:[...tasks.doing],
-      done:[...tasks.done]
-    };
+    const updated = structuredClone(tasks);
+    const item = updated[data.column][data.index];
 
-    updated[data.column].splice(data.index,1);
+    updated[data.column].splice(data.index, 1);
     updated[target].push(item);
 
     setTasks(updated);
+  }
+
+  function confirmMoveToDone(){
+    if(!confirmDone) return;
+
+    const updated = structuredClone(tasks);
+    const task = updated[confirmDone.col][confirmDone.index];
+
+    task.checklist = task.checklist.map(c=>({...c,done:true}));
+
+    updated[confirmDone.col].splice(confirmDone.index,1);
+    updated.done.push(task);
+    setTasks(updated);
+    setConfirmDone(null);
+
+    if(!document.querySelector('.app.tea')){
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
   }
 
   return (
@@ -140,6 +208,22 @@ export default function Kanban() {
         </div>
       )}
 
+      {globalInputAlert && (
+        <div className="modal-overlay" onClick={() => setGlobalInputAlert(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>Alerta Cognitivo</h3>
+            <p>
+              Você está há algum tempo nesta tarefa sem interação.
+              <br />
+              Que tal fazer uma pequena pausa?
+            </p>
+            <button className="btn primary" onClick={() => setGlobalInputAlert(false)}>
+              Continuar
+            </button>
+          </div>
+        </div>
+      )}
+
       {deleteModal && (
         <div className="modal-overlay" onClick={()=>setDeleteModal(null)}>
           <div className="modal" onClick={(e)=>e.stopPropagation()}>
@@ -148,6 +232,22 @@ export default function Kanban() {
             <div style={{display:"flex",gap:"10px"}}>
               <button className="btn danger" onClick={confirmDelete}>Sim</button>
               <button className="btn secondary" onClick={()=>setDeleteModal(null)}>Não</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDone && (
+        <div className="modal-overlay" onClick={()=>setConfirmDone(null)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <h3>Concluir tarefa?</h3>
+            <p>
+              Ao mover a tarefa para concluído, ela não poderá mais ser movimentada.
+              <br/>Confirma?
+            </p>
+            <div style={{display:"flex",gap:"10px",justifyContent:"center"}}>
+              <button className="btn primary" onClick={confirmMoveToDone}>Confirmar</button>
+              <button className="btn secondary" onClick={()=>setConfirmDone(null)}>Cancelar</button>
             </div>
           </div>
         </div>
@@ -176,23 +276,17 @@ export default function Kanban() {
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => onDrop(e, typedKey)}
           >
-            <h3>
-              {key === 'todo'
-                ? 'A Fazer'
-                : key === 'doing'
-                ? 'Em Progresso'
-                : 'Concluído'}
-            </h3>
+            <h3>{key === 'todo' ? 'A Fazer' : key === 'doing' ? 'Em Progresso' : 'Concluído'}</h3>
 
             {list.map((task, i) => (
               <div
-                className={`card ${key === 'doing' ? 'pulse' : ''} ${key === 'done' ? 'done' : ''}`}
+                className={`card ${key === 'done' ? 'done' : ''}`}
                 key={i}
                 draggable={key !== 'done'}
                 onDragStart={(e) => onDragStart(e, typedKey, i)}
               >
                 <div className="task-header">
-                  <span className="task-title">{task.text}</span>
+                  <span>{task.text}</span>
                   <button className="delete-btn" onClick={()=>setDeleteModal({col:typedKey,index:i})}>🗑️</button>
                 </div>
 
@@ -206,7 +300,7 @@ export default function Kanban() {
                   <input
                     autoFocus
                     className="task-input"
-                    placeholder="Digite o item e pressione Enter ou clique fora"
+                    placeholder="Digite o item"
                     onBlur={(e)=>saveChecklist(typedKey,i,e.target.value)}
                     onKeyDown={(e)=>{
                       if(e.key==="Enter"){
@@ -219,13 +313,18 @@ export default function Kanban() {
                 {task.checklist.length > 0 && (
                   <>
                     <div className="progress-bar">
-                      <div className="progress" style={{width:progress(task)+'%'}}></div>
+                      <div className="progress" style={{width:progress(task)+'%'}} />
                     </div>
 
                     <ul className="checklist">
                       {task.checklist.map((c,ci)=>(
                         <li key={ci}>
-                          <input type="checkbox" checked={c.done} onChange={()=>toggleChecklist(typedKey,i,ci)} />
+                          <input
+                            className="check"
+                            type="checkbox"
+                            checked={c.done}
+                            onChange={()=>toggleChecklist(typedKey,i,ci)}
+                          />
                           {c.text}
                         </li>
                       ))}
@@ -237,7 +336,6 @@ export default function Kanban() {
           </div>
         );
       })}
-
     </section>
   );
 }
