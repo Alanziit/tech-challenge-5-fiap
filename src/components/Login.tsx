@@ -1,32 +1,30 @@
 import React, { useState } from 'react';
+import App from '../App';
+import Cadastro from './Cadastro';
+import { useAuth } from '../infra/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
-  const [isRegister, setIsRegister] = useState(false);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCadastro, setShowCadastro] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isRegister) {
-      if (password !== confirmPassword) {
-        alert('As senhas não coincidem');
-        return;
-      }
-      // Handle register logic here
-      console.log('Register - Username:', username, 'Password:', password);
-    } else {
-      // Handle login logic here
-      console.log('Login - Username:', username, 'Password:', password);
+
+    const isLogged = await login(email, password);
+
+    if (isLogged) {
+      console.log("Login realizado com sucesso!");
+      navigate('/home')
     }
   };
 
-  const toggleMode = () => {
-    setIsRegister(!isRegister);
-    setUsername('');
-    setPassword('');
-    setConfirmPassword('');
-  };
+  if (showCadastro) {
+    return <Cadastro onBack={() => setShowCadastro(false)} />;
+  }
 
   return (
     <div style={{
@@ -47,15 +45,15 @@ const Login: React.FC = () => {
       }}>
         <h2 style={{ color: '#000000', marginBottom: '20px' }}>MindEase</h2>
         <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="username" style={{ display: 'block', color: '#000000', marginBottom: '5px' }}>
-            {isRegister ? 'Nome de usuário para cadastro' : 'Nome de usuário'}
+          <label htmlFor="email" style={{ display: 'block', color: '#000000', marginBottom: '5px' }}>
+            Email
           </label>
           <input
-            type="text"
-            id="username"
-            placeholder='Insira seu do de usuário do sistema'
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            id="email"
+            placeholder='Insira seu email do sistema'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             style={{
               width: '100%',
               padding: '10px',
@@ -67,7 +65,7 @@ const Login: React.FC = () => {
             required
           />
         </div>
-        <div style={{ marginBottom: isRegister ? '15px' : '20px' }}>
+        <div style={{ marginBottom: '20px' }}>
           <label htmlFor="password" style={{ display: 'block', color: '#000000', marginBottom: '5px' }}>Senha do sistema</label>
           <input
             type="password"
@@ -86,27 +84,6 @@ const Login: React.FC = () => {
             required
           />
         </div>
-        {isRegister && (
-          <div style={{ marginBottom: '20px' }}>
-            <label htmlFor="confirmPassword" style={{ display: 'block', color: '#000000', marginBottom: '5px' }}>Confirmar senha do sistema</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              placeholder='Insira novamente a senha'
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #159fd7',
-                borderRadius: '4px',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
-              required
-            />
-          </div>
-        )}
         <button type="submit" style={{
           width: '100%',
           padding: '10px',
@@ -118,9 +95,9 @@ const Login: React.FC = () => {
           cursor: 'pointer',
           marginBottom: '10px'
         }}>
-          {isRegister ? 'Realizar Cadastro' : 'Acessar Sistema'}
+          Acessar Sistema
         </button>
-        <button type="button" onClick={toggleMode} style={{
+        <button type="button" onClick={() => setShowCadastro(true)} style={{
           width: '100%',
           padding: '10px',
           backgroundColor: 'transparent',
@@ -130,7 +107,7 @@ const Login: React.FC = () => {
           fontSize: '16px',
           cursor: 'pointer'
         }}>
-          {isRegister ? 'Já possui cadastro? Clique aqui para acessar o sistema' : 'Ainda não é cadastrado? Clique aqui e realize o cadastro no sistema'}
+          Cadastrar
         </button>
       </form>
     </div>
