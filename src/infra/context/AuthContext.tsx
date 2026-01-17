@@ -7,7 +7,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { createContext, ReactNode, useContext, useState } from "react";
-import { auth } from "../../firebaseConfig.tsx";
+import { auth } from "../../firebaseConfig";
 import { User } from "../../domain/entities/user.entity";
 import { UserController } from "../../presentation/UserController";
 

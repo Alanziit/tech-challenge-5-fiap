@@ -2,7 +2,7 @@
 import { get, ref, update } from "firebase/database";
 import { UserRepository } from "../domain/interfaces/user.interface";
 import { CacheService } from "../infra/cache/cache.service";
-import { database } from "../firebaseConfig.tsx";
+import { database } from "../firebaseConfig";
 
 export class UserRepositoryImpl implements UserRepository{
 

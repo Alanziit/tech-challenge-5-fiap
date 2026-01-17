@@ -1,5 +1,12 @@
 import '@testing-library/jest-dom';
 
+// Mock do Firebase App
+jest.mock('firebase/app', () => ({
+  initializeApp: jest.fn(),
+  getApp: jest.fn(),
+  getApps: jest.fn(() => []),
+}));
+
 // Mock do Firebase Auth
 jest.mock('firebase/auth', () => ({
   initializeApp: jest.fn(),
@@ -25,6 +32,21 @@ jest.mock('firebase/database', () => ({
   get: jest.fn(),
   update: jest.fn(),
 }));
+
+// Mock do Firebase Storage
+jest.mock('firebase/storage', () => ({
+  getStorage: jest.fn(() => ({})),
+}));
+
+// Mock do firebaseConfig para evitar erro ao importar
+jest.mock('../src/firebaseConfig', () => ({
+  app: {},
+  auth: {
+    currentUser: null,
+  },
+  storage: {},
+  database: {},
+}), { virtual: true });
 
 // Suprimir logs do console durante testes
 global.console = {
