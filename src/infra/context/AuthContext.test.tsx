@@ -357,18 +357,23 @@ describe('AuthContext - Testes Unitários', () => {
   // ========== TESTES DO HOOK useAuth ==========
   describe('6. Hook useAuth', () => {
     it('deve lançar erro quando usado fora do AuthProvider', () => {
-      // Suprime erros de console para não poluir output do teste
-      const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      // Espera exatamente 1 expect neste teste
+      expect.assertions(1);
+
+      // Suprime todos os console methods para evitar que jsdom reporte como erro
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       try {
         renderHook(() => useAuth());
-        // Se chegar aqui, o teste falha (deveria ter lançado erro)
-        fail('esperava que renderHook lançasse um erro');
+        // Se renderHook não lançar, o erro esperado não ocorreu
+        throw new Error('renderHook deveria ter lançado um erro');
       } catch (error: any) {
         // Verifica se o erro contém a mensagem esperada
         expect(error.message).toContain('Contexto não encontrado');
       } finally {
-        spy.mockRestore();
+        errorSpy.mockRestore();
+        warnSpy.mockRestore();
       }
     });
   });
