@@ -70,10 +70,10 @@ jobs:
         with:
           name: build-${{ github.run_id }}
           path: build/
-      - name: Verificar conteúdo do JSON
+      - name: Verificar Serviços Firebase
         run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" > key.json
-          cat key.json | head -n 10
+          echo "${{ FIREBASE_PROJECT_ID }}"
+
           
       - name: Deploy no Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
