@@ -1,0 +1,77 @@
+name: Build, Test e Deploy Firebase
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Executar testes unitários
+        run: npm run test -- --coverage --watchAll=false
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+
+      - name: Build do projeto
+        run: npm run build
+
+      - name: Upload artefatos de build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.run_id }}
+          path: build/
+          retention-days: 1
+
+  deploy-firebase:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Download artefatos de build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.run_id }}
+          path: build/
+
+      - name: Deploy no Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          channelId: live

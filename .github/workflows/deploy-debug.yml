@@ -1,0 +1,132 @@
+name: Build, Test e Deploy Firebase (com Debugging)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+env:
+  NODE_ENV: production
+  CI: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build & Test (${{ matrix.node-version }})
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+      fail-fast: false
+
+    steps:
+      - name: 📥 Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: 🔍 Verificar versões
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Git version: $(git --version)"
+
+      - name: 📚 Instalar dependências
+        run: npm ci
+        continue-on-error: false
+
+      - name: 🧪 Executar testes unitários com cobertura
+        run: npm run test -- --coverage --watchAll=false --passWithNoTests
+        continue-on-error: true
+
+      - name: 📊 Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: 🏗️ Build do projeto
+        run: npm run build
+
+      - name: 📂 Listar artefatos de build
+        if: success()
+        run: |
+          echo "Conteúdo de build/:"
+          ls -la build/ | head -20
+          echo "Total de arquivos: $(find build -type f | wc -l)"
+
+      - name: 📦 Upload artefatos de build
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: build-${{ github.run_id }}
+          path: build/
+          retention-days: 1
+          compression-level: 6
+
+  deploy-firebase:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    name: Deploy Firebase Hosting
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: 📥 Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: 🔐 Verificar secrets
+        run: |
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" ]; then
+            echo "❌ FIREBASE_SERVICE_ACCOUNT_JSON não configurado!"
+            exit 1
+          fi
+          if [ -z "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
+            echo "❌ FIREBASE_PROJECT_ID não configurado!"
+            exit 1
+          fi
+          echo "✅ Secrets verificados com sucesso"
+
+      - name: 📥 Download artefatos de build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.run_id }}
+          path: build/
+
+      - name: 📂 Verificar artefatos
+        run: |
+          echo "Conteúdo de build/:"
+          ls -la build/ | head -10
+          if [ ! -f "build/index.html" ]; then
+            echo "❌ index.html não encontrado!"
+            exit 1
+          fi
+
+      - name: 🚀 Deploy no Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          channelId: live
+
+      - name: ✅ Deploy Concluído
+        run: |
+          echo "Seu app foi publicado no Firebase Hosting!"
+          echo "Projeto: ${{ secrets.FIREBASE_PROJECT_ID }}"
+          echo "Acesse: https://${{ secrets.FIREBASE_PROJECT_ID }}.firebaseapp.com"
