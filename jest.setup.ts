@@ -39,25 +39,11 @@ jest.mock('firebase/storage', () => ({
 }));
 
 // Mock do firebaseConfig para evitar erro ao importar
-// Mocka tanto o arquivo real quanto o exemplo para suportar
-// desenvolvimento local e CI/CD logo após clonar o repositório
-jest.mock('./src/firebaseConfig', () => ({
-  app: {},
-  auth: {
-    currentUser: null,
-  },
-  storage: {},
-  database: {},
-}));
-
-jest.mock('./src/firebaseConfig.example', () => ({
-  app: {},
-  auth: {
-    currentUser: null,
-  },
-  storage: {},
-  database: {},
-}));
+// Usa o arquivo example (que existe no git) como mock
+// Funciona mesmo quando firebaseConfig.tsx não existe (pois está no .gitignore)
+jest.mock('./src/firebaseConfig', () => 
+  jest.requireActual('./src/firebaseConfig.example')
+);
 
 // Suprimir logs do console durante testes
 global.console = {
