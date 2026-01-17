@@ -373,7 +373,7 @@ describe('AuthContext - Testes Unitários', () => {
       expect(result.current.signup).toBeDefined();
       expect(result.current.logout).toBeDefined();
       expect(result.current.loading).toBe(false);
-      expect(result.current.currentUser).toBeUndefined();
+      expect(result.current.user).toBeNull();
     });
   });
 
