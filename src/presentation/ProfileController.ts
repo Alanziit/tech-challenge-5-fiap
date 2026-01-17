@@ -14,4 +14,12 @@ export class ProfileConstroller {
     async createProfile(profile: any): Promise<boolean> {
         return this._profileUsecase.createProfile(profile);
     }
+
+    async updateProfile(profile: any): Promise<boolean> {
+        return this._profileUsecase.updateProfile(profile);
+    }
+
+    async getProfile(id: string): Promise<any | null> {
+        return this._profileUsecase.getProfile(id);
+    }
 }

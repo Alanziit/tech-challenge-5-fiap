@@ -4,6 +4,7 @@ import {
   reauthenticateWithCredential,
   signInWithEmailAndPassword,
   UserCredential,
+  signOut,
 } from "firebase/auth";
 import { createContext, ReactNode, useContext, useState } from "react";
 import { auth } from "../../firebaseConfig";
@@ -20,7 +21,7 @@ interface IAuthContext {
     email: string,
     password: string
   ) => Promise<UserCredential | void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
@@ -78,12 +79,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    auth.signOut();
-    console.log("Logout chamado, usuário deslogado com sucesso");
-    setUser(null);
-    setIsAuthenticated(false);
-    setProfile(null);
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      setIsAuthenticated(false);
+      setProfile(null);
+      console.log("✅ Logout realizado com sucesso");
+    } catch (error) {
+      console.error("❌ Erro ao fazer logout:", error);
+      throw error;
+    }
   };
 
   return (

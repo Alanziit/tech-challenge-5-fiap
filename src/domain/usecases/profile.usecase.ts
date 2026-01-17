@@ -7,5 +7,12 @@ export class ProfileUsecase {
     async createProfile(profile: any): Promise<boolean> {
         return this._profileRepository.createProfile(profile);
     }
-    
+
+    async updateProfile(profile: any): Promise<boolean> {
+        return this._profileRepository.updateProfile(profile);
+    }
+
+    async getProfile(id: string): Promise<any | null> {
+        return this._profileRepository.getProfile(id);
+    }
 } 
