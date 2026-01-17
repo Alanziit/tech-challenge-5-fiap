@@ -3,6 +3,7 @@ import App from '../App';
 import Cadastro from './Cadastro';
 import { useAuth } from '../infra/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../shared/components/ToastContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const Login: React.FC = () => {
   const [showCadastro, setShowCadastro] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,8 +19,12 @@ const Login: React.FC = () => {
     const isLogged = await login(email, password);
 
     if (isLogged) {
-      console.log("Login realizado com sucesso!");
-      navigate('/home')
+      addToast("Login realizado com sucesso!", "success");
+      setTimeout(() => {
+        navigate('/home');
+      }, 500);
+    } else {
+      addToast("Erro ao realizar login. Verifique suas credenciais.", "error");
     }
   };
 

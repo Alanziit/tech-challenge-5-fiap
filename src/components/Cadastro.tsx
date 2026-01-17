@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../infra/context/AuthContext';
+import { useToast } from '../shared/components/ToastContext';
 import { Profile } from '../domain/entities/profile.entity';
 import { ProfileConstroller } from '../presentation/ProfileController';
 
@@ -11,14 +13,22 @@ const Cadastro: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { signup } = useAuth();
+  const navigate = useNavigate();
+  const { addToast } = useToast();
   const profileController = new ProfileConstroller();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (password !== confirmPassword) {
+      addToast("As senhas não conferem!", "error");
+      return;
+    }
+
     const signupResult = await signup(email, password);
 
     if (!signupResult) {
+      addToast("Erro ao criar conta. O email pode já estar cadastrado.", "error");
       return;
     }
 
@@ -33,9 +43,14 @@ const Cadastro: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const resp = await profileController.createProfile(profile);
 
     if (resp) {
-      console.log("Perfil criado com sucesso!");
+      addToast("Perfil criado com sucesso! Redirecionando para login...", "success");
+      // Redireciona para tela de login após 1.5 segundos
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
+    } else {
+      addToast("Erro ao criar perfil. Tente novamente.", "error");
     }
-    console.log('Cadastro - Username:', username, 'Email:', email, 'Password:', password, 'Confirm Password:', confirmPassword);
 
   };
 

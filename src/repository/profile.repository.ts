@@ -7,10 +7,19 @@ import { CacheService } from "../infra/cache/cache.service";
 export class ProfileRepositoryImpl implements ProfileRepository {
     async createProfile(profile: any): Promise<boolean> {
         try {
+            // Validação: database inicializado
+            if (!database) {
+                throw new Error("❌ Database não está inicializado. Verifique a configuração do Firebase.");
+            }
+
+            // Validação: perfil e ID válidos
+            if (!profile || !profile.id) {
+                throw new Error("❌ Perfil ou ID do perfil inválido.");
+            }
+
             await set(ref(database, `profiles/${profile.id}`), { 
               nome: profile.userName,
               dataCriacao: profile.dataCriacao.toString(),
-              conta: profile.conta ?? { saldo: 0, extrato: [] },
             });
         
             await CacheService.set(`user_${profile.id}`, profile);
