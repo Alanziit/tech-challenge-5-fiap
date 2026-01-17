@@ -44,14 +44,22 @@ cd tech-challenge-5-fiap
 # 2. Instale as dependências
 npm install
 
-# 3. Configure Firebase (crie .env.local com credenciais)
-# REACT_APP_FIREBASE_API_KEY=...
-# REACT_APP_FIREBASE_AUTH_DOMAIN=...
-# etc...
+# 3. Configure Firebase - IMPORTANTE ⚠️
+# Copia o arquivo de exemplo e preencha com suas credenciais reais
+cp src/firebaseConfig.example.tsx src/firebaseConfig.tsx
+# Edite src/firebaseConfig.tsx com suas credenciais do Firebase Console
+# Ou use variáveis de ambiente em .env.local
+
+# Arquivo de exemplo de .env
+cp .env.example .env.local
+# Edite .env.local com suas credenciais
 
 # 4. Inicie o desenvolvimento
 npm start
 ```
+
+> ⚠️ **SEGURANÇA**: O arquivo `src/firebaseConfig.tsx` contém credenciais do Firebase e está no `.gitignore`. 
+> Nunca faça commit de credenciais reais no repositório. Use `firebaseConfig.example.tsx` como referência.
 
 A aplicação estará em: `http://localhost:3000`
 
