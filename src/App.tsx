@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ToastProvider } from './shared/components/ToastContext';
 import Dashboard from './components/Dashboard';
 import Kanban from './components/Kanban';
 import Pomodoro from './components/Pomodoro';
@@ -33,39 +34,41 @@ export default function App(){
   },[focusMode,contrast,spacing,fontSize]);
 
   return(
-    <BrowserRouter>
-      <div className={`app 
-        ${focusMode ? 'focus' : ''} 
-        ${teaMode ? 'tea' : ''} 
-        ${dyslexiaMode ? 'dyslexia' : ''} 
-        ${contrast === 'high' ? 'contrast' : ''} 
-        ${spacing} 
-        ${fontSize}`}
+    <ToastProvider>
+      <BrowserRouter>
+        <div className={`app 
+          ${focusMode ? 'focus' : ''} 
+          ${teaMode ? 'tea' : ''} 
+          ${dyslexiaMode ? 'dyslexia' : ''} 
+          ${contrast === 'high' ? 'contrast' : ''} 
+          ${spacing} 
+          ${fontSize}`}
 >
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/home" element={
-            <>
-              <Dashboard
-                focus={focusMode}
-                onFocusToggle={()=>setFocusMode(!focusMode)}
-                onContrast={()=>setContrast(contrast==='normal'?'high':'normal')}
-                spacing={spacing}
-                setSpacing={setSpacing}
-                fontSize={fontSize}
-                setFontSize={setFontSize}
-                tea={teaMode}
-                onTea={()=>{ setTeaMode(!teaMode); if(!teaMode) setDyslexiaMode(false); }}
-                dyslexia={dyslexiaMode}
-                onDyslexia={()=>{ setDyslexiaMode(!dyslexiaMode); if(!dyslexiaMode) setTeaMode(false); }}
-              />
-              <Pomodoro/>
-              <Kanban/>
-            </>
-          } />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/home" element={
+              <>
+                <Dashboard
+                  focus={focusMode}
+                  onFocusToggle={()=>setFocusMode(!focusMode)}
+                  onContrast={()=>setContrast(contrast==='normal'?'high':'normal')}
+                  spacing={spacing}
+                  setSpacing={setSpacing}
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                  tea={teaMode}
+                  onTea={()=>{ setTeaMode(!teaMode); if(!teaMode) setDyslexiaMode(false); }}
+                  dyslexia={dyslexiaMode}
+                  onDyslexia={()=>{ setDyslexiaMode(!dyslexiaMode); if(!dyslexiaMode) setTeaMode(false); }}
+                />
+                <Pomodoro/>
+                <Kanban/>
+              </>
+            } />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </ToastProvider>
   );
 }
