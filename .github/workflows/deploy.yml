@@ -71,10 +71,6 @@ jobs:
           name: build-${{ github.run_id }}
           path: build/
 
-      - name: Verificar Serviços Firebase
-        run: |
-          echo "${{ FIREBASE_PROJECT_ID }}"
-          
       - name: Deploy no Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
