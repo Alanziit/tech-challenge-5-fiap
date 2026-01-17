@@ -1,6 +1,6 @@
 import { ref, set, get, update } from "firebase/database";
 import { ProfileRepository } from "../domain/interfaces/profile.interface";
-import { database } from "../firebaseConfig";
+import { database } from "../firebaseConfig.tsx";
 import { CacheService } from "../infra/cache/cache.service";
 
 export class ProfileRepositoryImpl implements ProfileRepository {
