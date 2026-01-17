@@ -39,7 +39,18 @@ jest.mock('firebase/storage', () => ({
 }));
 
 // Mock do firebaseConfig para evitar erro ao importar
+// Mocka tanto o arquivo real quanto o exemplo para suportar
+// desenvolvimento local e CI/CD logo após clonar o repositório
 jest.mock('./src/firebaseConfig', () => ({
+  app: {},
+  auth: {
+    currentUser: null,
+  },
+  storage: {},
+  database: {},
+}));
+
+jest.mock('./src/firebaseConfig.example', () => ({
   app: {},
   auth: {
     currentUser: null,
