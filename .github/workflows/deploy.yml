@@ -44,7 +44,7 @@ jobs:
           name: codecov-umbrella
 
       - name: Setup Firebase Config para Build
-        run: cp src/firebaseConfig.tsx src
+        run: cp src/firebaseConfig.example src/firebaseConfig.tsx
 
       - name: Build do projeto
         run: npm run build
