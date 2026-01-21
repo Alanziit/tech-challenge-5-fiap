@@ -97,6 +97,3 @@ Thumbs.db
 *.db
 *.sqlite
 *.sqlite3
-
-#Firebase Config
-firebaseConfig.*
