@@ -12,11 +12,6 @@ dist/
 .env.test.local
 .env.production.local
 
-# Firebase credentials (sensitive information)
-src/firebaseConfig.tsx
-# But allow the example file to be tracked
-!/src/firebaseConfig.example.tsx
-
 # Logs
 npm-debug.log*
 yarn-debug.log*
