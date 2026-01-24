@@ -6,12 +6,12 @@ import { getStorage } from 'firebase/storage';
 import { getDatabase } from 'firebase/database';
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID
+  apiKey: "AIzaSyBYMuIK2et3LtPfTH_IcaWz0R5gcCR0DXE",
+  authDomain: "tech-challange-5-fiap.firebaseapp.com",
+  projectId: "tech-challange-5-fiap",
+  storageBucket: "tech-challange-5-fiap.appspot.com",
+  messagingSenderId: "10103477670",
+  appId: "1:10103477670:web:cb033dd23cb1e697732b67"
 };
 
 
