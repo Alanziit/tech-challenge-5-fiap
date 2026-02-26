@@ -30,8 +30,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Instalar dependências
-        run: npm ci
+      - name: Instalar dependências (inclui devDependencies)
+        run: npm ci --include=dev
+        env:
+          NODE_ENV: development
 
       - name: Executar testes unitários
         run: npm run test -- --coverage --watchAll=false

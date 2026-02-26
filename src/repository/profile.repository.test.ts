@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import { ProfileRepositoryImpl } from './profile.repository';
 import { CacheService } from '../infra/cache/cache.service';
 import * as FirebaseDatabase from 'firebase/database';
