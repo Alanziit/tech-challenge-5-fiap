@@ -134,38 +134,23 @@ src/
 ├── tsconfig.json              # Configuração TypeScript
 ├── package.json               # Dependências e scripts
 ├── firebase.json              # Configuração Firebase Hosting
+├── .firebaserc                # ID do projeto Firebase
 │
-├── 📖 Documentação Geral
-│   ├── README.md             # Este arquivo
-│   ├── 00_COMECE_AQUI.md     # Guia de início rápido
-│   ├── INDICE_COMPLETO.md    # Índice completo da documentação
-│   ├── RESUMO_FINAL.md       # Resumo do projeto
-│   └── ENV_VARIABLES.md      # Variáveis de ambiente
+├── 📖 Documentação
+│   ├── README.md              # Este arquivo
+│   └── DOCUMENTACAO.md        # Documentação completa do projeto
 │
-├── 🚨 Troubleshooting
-│   ├── ERROS_E_CORRECOES.md  # Histórico de erros e soluções
-│   └── FAQ_TROUBLESHOOTING.md # Perguntas frequentes e respostas
+├── 🚀 Scripts
+│   ├── setup-cicd.sh          # Setup CI/CD (Linux/Mac)
+│   └── setup-cicd.bat         # Setup CI/CD (Windows)
 │
-├── 🔄 CI/CD Pipeline
-│   ├── CI_CD_SETUP.md        # Setup inicial de CI/CD
-│   ├── CICD_QUICKSTART.md    # Guia rápido de CI/CD
-│   ├── CICD_ADVANCED.md      # Configurações avançadas
-│   ├── IMPLEMENTACAO_CICD.md # Detalhes de implementação
-│   ├── README_CICD.md        # Documentação específica CI/CD
-│   ├── CHECKLIST_CICD.md     # Checklist de verificação
-│   ├── COMANDOS_CICD.md      # Comandos úteis de CI/CD
-│   ├── DIAGRAMA_CICD.md      # Diagrama visual do pipeline
-│   ├── setup-cicd.sh         # Script de setup (Linux/Mac)
-│   └── setup-cicd.bat        # Script de setup (Windows)
-│
-├── 📊 Arquivos de Projeto
-│   ├── ARQUIVOS_COMMIT.md    # Histórico de commits e mudanças
-│   ├── TEST_FIXES_SUMMARY.md # Resumo de correções de testes
+├── 📊 Dados de Projeto
 │   └── performance-alan-d3aa3d26441a.json # Relatório de performance
 │
-└── build/                     # Build de produção (gerado)
-└── coverage/                  # Relatórios de cobertura (gerado)
-└── public/                    # Arquivos estáticos
+└── Diretórios Gerados
+   ├── build/                  # Build de produção (gerado)
+   ├── coverage/               # Relatórios de cobertura (gerado)
+   └── public/                 # Arquivos estáticos
 ```
 
 ## 🏗️ Arquitetura
@@ -379,20 +364,21 @@ npm run test:coverage
 - Logs informativos no console
 - Error boundaries (recomendado)
 
-## 📚 Documentação Completa
+## 📚 Documentação
 
-Este projeto inclui documentação extensa em vários arquivos. Consulte:
+A documentação completa do projeto está centralizada em **[DOCUMENTACAO.md](DOCUMENTACAO.md)**, que inclui:
 
-| Arquivo | Conteúdo |
-|---------|----------|
-| [00_COMECE_AQUI.md](00_COMECE_AQUI.md) | Começar rápido - primeiros passos |
-| [INDICE_COMPLETO.md](INDICE_COMPLETO.md) | Índice de toda a documentação |
-| [RESUMO_FINAL.md](RESUMO_FINAL.md) | Resumo executivo do projeto |
-| [ENV_VARIABLES.md](ENV_VARIABLES.md) | Variáveis de ambiente necessárias |
-| [ERROS_E_CORRECOES.md](ERROS_E_CORRECOES.md) | Histórico de erros e soluções |
-| [FAQ_TROUBLESHOOTING.md](FAQ_TROUBLESHOOTING.md) | Perguntas frequentes |
-| **CI/CD Docs** | `README_CICD.md`, `CI_CD_SETUP.md`, `CICD_QUICKSTART.md` |
-| [TEST_FIXES_SUMMARY.md](TEST_FIXES_SUMMARY.md) | Resumo de correções em testes |
+- 🚀 Início rápido e instalação
+- 📂 Estrutura completa do projeto
+- 🛠️ Tecnologias utilizadas
+- 📥 Setup detalhado (Firebase, variáveis de ambiente)
+- 🧪 Guia de testes unitários
+- 🔄 Configuração de CI/CD Pipeline
+- 🏗️ Informações sobre Arquitetura
+- 🤝 Diretrizes de contribuição
+- 🔧 Troubleshooting e FAQ
+
+Acesse [DOCUMENTACAO.md](DOCUMENTACAO.md) para obter informações completas sobre qualquer aspecto do projeto.
 
 ## 🤝 Contribuindo
 
