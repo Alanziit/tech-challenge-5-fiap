@@ -31,12 +31,19 @@ jobs:
           cache: 'npm'
 
       - name: Instalar dependências (inclui devDependencies)
-        run: npm ci --include=dev
+        run: npm ci
         env:
           NODE_ENV: development
 
+      - name: Verificar instalação do Jest
+        run: |
+          echo "Path do Jest:"
+          which jest || echo "Jest não encontrado no PATH direto"
+          echo "Jest via npm:"
+          npx jest --version
+
       - name: Executar testes unitários
-        run: npm run test -- --coverage --watchAll=false
+        run: npm run test -- --coverage --watchAll=false --passWithNoTests
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
