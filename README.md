@@ -86,38 +86,86 @@ src/
 │
 ├── domain/                     # Camada de Domínio
 │   ├── entities/
-│   │   ├── profile.entity.ts  # Interface Profile com StylePreferences
-│   │   └── user.entity.ts
+│   │   ├── profile.entity.ts  # Entidade Profile com StylePreferences
+│   │   └── user.entity.ts     # Entidade User
 │   ├── interfaces/
-│   │   ├── profile.interface.ts # Repo interface (CRUD completo)
-│   │   └── user.interface.ts
+│   │   ├── profile.interface.ts # Interface de contrato (CRUD)
+│   │   └── user.interface.ts   # Interface de contrato
 │   └── usecases/
 │       ├── profile.usecase.ts  # Casos de uso do perfil
-│       └── user.usecase.ts
+│       └── user.usecase.ts     # Casos de uso do usuário
 │
 ├── infra/                      # Camada de Infraestrutura
 │   ├── cache/
-│   │   └── cache.service.ts   # Serviço de cache com TTL
+│   │   ├── cache.service.ts   # Serviço de cache com TTL
+│   │   └── cache.service.test.ts # ✅ Testes unitários
 │   └── context/
-│       ├── AuthContext.tsx     # Contexto de autenticação
-│       └── AuthContext.test.tsx # ✅ 19 testes unitários
+│       └── AuthContext.tsx     # Contexto de autenticação com Firebase
 │
 ├── presentation/               # Camada de Apresentação
-│   ├── ProfileController.ts   # Controller com CRUD
-│   └── UserController.ts
+│   ├── ProfileController.ts   # Controller para operações de perfil
+│   └── UserController.ts      # Controller para operações de usuário
 │
 ├── repository/                 # Camada de Repositório
-│   ├── profile.repository.ts  # CRUD: create, update, get
-│   └── user.repository.ts
+│   ├── profile.repository.ts  # CRUD: create, update, get, delete
+│   ├── profile.repository.test.ts # ✅ Testes do repositório
+│   ├── user.repository.ts     # Repositório de usuário
+│   └── user.repository.test.ts # ✅ Testes do repositório
 │
 ├── shared/                     # Componentes Compartilhados
 │   └── components/
-│       ├── Toast.tsx          # Componente de notificação
+│       ├── Toast.tsx          # Componente de notificação Toast
 │       └── ToastContext.tsx   # Context para gerenciar toasts
 │
-├── App.tsx                     # Component principal com sincronização
-├── firebaseConfig.tsx          # Configuração do Firebase
-└── styles.css
+├── App.tsx                     # Componente principal com sincronização
+├── firebaseConfig.tsx          # Configuração do Firebase (credenciais)
+├── firebaseConfig.example.tsx  # Exemplo de configuração (template)
+├── index.tsx                   # Ponto de entrada da aplicação
+├── react-app-env.d.ts         # Tipos TypeScript do React App
+├── setupTests.ts              # Configuração de testes Jest
+└── styles.css                 # Estilos globais
+```
+
+### Arquivos de Configuração (root)
+
+```
+├── jest.config.js             # Configuração do Jest
+├── jest.setup.ts              # Setup para testes
+├── tsconfig.json              # Configuração TypeScript
+├── package.json               # Dependências e scripts
+├── firebase.json              # Configuração Firebase Hosting
+│
+├── 📖 Documentação Geral
+│   ├── README.md             # Este arquivo
+│   ├── 00_COMECE_AQUI.md     # Guia de início rápido
+│   ├── INDICE_COMPLETO.md    # Índice completo da documentação
+│   ├── RESUMO_FINAL.md       # Resumo do projeto
+│   └── ENV_VARIABLES.md      # Variáveis de ambiente
+│
+├── 🚨 Troubleshooting
+│   ├── ERROS_E_CORRECOES.md  # Histórico de erros e soluções
+│   └── FAQ_TROUBLESHOOTING.md # Perguntas frequentes e respostas
+│
+├── 🔄 CI/CD Pipeline
+│   ├── CI_CD_SETUP.md        # Setup inicial de CI/CD
+│   ├── CICD_QUICKSTART.md    # Guia rápido de CI/CD
+│   ├── CICD_ADVANCED.md      # Configurações avançadas
+│   ├── IMPLEMENTACAO_CICD.md # Detalhes de implementação
+│   ├── README_CICD.md        # Documentação específica CI/CD
+│   ├── CHECKLIST_CICD.md     # Checklist de verificação
+│   ├── COMANDOS_CICD.md      # Comandos úteis de CI/CD
+│   ├── DIAGRAMA_CICD.md      # Diagrama visual do pipeline
+│   ├── setup-cicd.sh         # Script de setup (Linux/Mac)
+│   └── setup-cicd.bat        # Script de setup (Windows)
+│
+├── 📊 Arquivos de Projeto
+│   ├── ARQUIVOS_COMMIT.md    # Histórico de commits e mudanças
+│   ├── TEST_FIXES_SUMMARY.md # Resumo de correções de testes
+│   └── performance-alan-d3aa3d26441a.json # Relatório de performance
+│
+└── build/                     # Build de produção (gerado)
+└── coverage/                  # Relatórios de cobertura (gerado)
+└── public/                    # Arquivos estáticos
 ```
 
 ## 🏗️ Arquitetura
@@ -222,77 +270,84 @@ npm run test:watch
 npm run test:coverage
 
 # Teste específico
-npm test -- AuthContext.test.tsx
+npm test -- cache.service.test.ts
+npm test -- profile.repository.test.ts
+npm test -- user.repository.test.ts
 ```
 
-### Cobertura (AuthContext.tsx)
+### Arquivos de Testes
 
-| Métrica | Cobertura | Status |
-|---------|-----------|--------|
-| Statements | 90.14% | ✅ Excelente |
-| Branches | 50% | ✅ Threshold |
-| Functions | 77.77% | ✅ Excelente |
-| Lines | 88.67% | ✅ Excelente |
+A suíte de testes está organizada da seguinte forma:
 
-### Testes Implementados (19 total)
+| Arquivo | Localização | Descrição |
+|---------|------------|-----------|
+| `cache.service.test.ts` | `src/infra/cache/` | Testes do serviço de cache |
+| `profile.repository.test.ts` | `src/repository/` | Testes do repositório de perfil |
+| `user.repository.test.ts` | `src/repository/` | Testes do repositório de usuário |
 
-**Suite 1: Estado Inicial (2)**
-- ✅ Inicialização com valores padrão
-- ✅ Disponibilidade de funções
+### Configuração de Testes
 
-**Suite 2: Login (4)**
-- ✅ Login bem-sucedido
-- ✅ Falha em login
-- ✅ Loading state
-- ✅ Parâmetros corretos
+- **Jest Config**: `jest.config.js`
+- **Setup**: `jest.setup.ts`
+- **TypeScript Support**: `ts-jest`
+- **Testing Library**: Para testes de componentes React
 
-**Suite 3: Signup (4)**
-- ✅ Criação bem-sucedida
-- ✅ Falha em criação
-- ✅ Loading state
-- ✅ Parâmetros corretos
+### Cobertura de Testes
 
-**Suite 4: Logout (4)**
-- ✅ Logout bem-sucedido
-- ✅ Erro em logout
-- ✅ Limpeza de dados
-- ✅ Chamada Firebase
+Cada arquivo de teste contém:
+- ✅ Testes de casos de sucesso
+- ✅ Testes de casos de erro
+- ✅ Mocks de dependências
+- ✅ Validação de comportamento esperado
 
-**Suite 5: Erros (3)**
-- ✅ Erro de rede
-- ✅ Usuário não encontrado
-- ✅ Erro Firebase
+Para visualizar cobertura completa:
+```bash
+npm run test:coverage
+# Abra coverage/lcov-report/index.html no navegador
+```
 
-**Suite 6: Hook useAuth (1)**
-- ✅ Erro fora do provider
+## 🔄 Implementações e Versão Atual
 
-**Suite 7: Fluxo Completo (1)**
-- ✅ Signup → Login → Logout
+### Sistema de Autenticação ✅
+- Firebase Auth integrado
+- Contexto global `AuthContext.tsx`
+- Protected routes
+- Session persistence
 
-## 🔄 Recentes Implementações
+### Sistema de Perfil e Preferências ✅
+- `profile.repository.ts` com CRUD completo
+- Persistência de `StylePreferences` no Firebase
+- Sincronização automática ao login
+- Controllers para operações
 
-### ✨ Nova: Sistema de Toast (v1.1)
-- Componente `Toast.tsx` com animações
-- Context `ToastContext.tsx` para gerenciamento
-- Integrado em Login, Cadastro, Dashboard
+### Gerenciamento de Cache ✅
+- `cache.service.ts` com TTL
+- Testes inclusos
+- Otimização de chamadas Firebase
 
-### ✨ Nova: Persistência de Preferências (v1.1)
-- `StylePreferences` interface adicionada ao Profile
-- Sincronização automática com Firebase
-- Carregamento ao login
-- Fallback para localStorage
+### Sistema de Notificações ✅
+- Toast component com animações
+- ToastContext para gerenciamento global
+- Auto-dismiss em 3 segundos
+- Posicionamento responsivo
 
-### ✨ Nova: Logout com Redirecionamento (v1.2)
-- Botão logout no Dashboard (canto superior direito) 🚪
+### Logout com Redirecionamento ✅
+- Botão logout no Dashboard
+- Notificação ao desconectar
+- Limpeza completa de estado
 - Redirecionamento para Login
-- Notificação Toast
-- Limpeza de estado completa
 
-### ✨ Nova: Testes Unitários (v1.2)
-- 19 testes para AuthContext
+### Testes Unitários ✅
+- Cache service com testes
+- Repository tests para perfil e usuário
 - Jest + Testing Library configurado
-- Cobertura 90%+ em AuthContext
-- Mocks Firebase completos
+- Coverage reporting
+
+### CI/CD Pipeline ✅
+- Scripts de setup automatizados
+- Documentação completa de CI/CD
+- Configuração Firebase Hosting
+- Checklist de verificação
 
 ## 📱 Responsividade
 
@@ -324,13 +379,20 @@ npm test -- AuthContext.test.tsx
 - Logs informativos no console
 - Error boundaries (recomendado)
 
-## 📚 Documentação
+## 📚 Documentação Completa
 
-Veja [ERROS_E_CORRECOES.md](ERROS_E_CORRECOES.md) para:
-- Histórico de erros e correções
-- Implementações de features
-- Detalhes de testes unitários
-- Cobertura de código
+Este projeto inclui documentação extensa em vários arquivos. Consulte:
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| [00_COMECE_AQUI.md](00_COMECE_AQUI.md) | Começar rápido - primeiros passos |
+| [INDICE_COMPLETO.md](INDICE_COMPLETO.md) | Índice de toda a documentação |
+| [RESUMO_FINAL.md](RESUMO_FINAL.md) | Resumo executivo do projeto |
+| [ENV_VARIABLES.md](ENV_VARIABLES.md) | Variáveis de ambiente necessárias |
+| [ERROS_E_CORRECOES.md](ERROS_E_CORRECOES.md) | Histórico de erros e soluções |
+| [FAQ_TROUBLESHOOTING.md](FAQ_TROUBLESHOOTING.md) | Perguntas frequentes |
+| **CI/CD Docs** | `README_CICD.md`, `CI_CD_SETUP.md`, `CICD_QUICKSTART.md` |
+| [TEST_FIXES_SUMMARY.md](TEST_FIXES_SUMMARY.md) | Resumo de correções em testes |
 
 ## 🤝 Contribuindo
 
@@ -344,21 +406,27 @@ Veja [ERROS_E_CORRECOES.md](ERROS_E_CORRECOES.md) para:
 
 Tech Challenge 5 FIAP - 2026
 
-## ✅ Checklist Final
+## ✅ Checklist do Projeto
 
 - [x] Autenticação com Firebase
-- [x] Persistência de preferências
-- [x] Sistema Toast compartilhado
+- [x] Sistema de perfil do usuário
+- [x] Persistência de preferências de estilo
+- [x] Sistema Toast de notificações
 - [x] Logout com redirecionamento
-- [x] 19 testes unitários
-- [x] Cobertura 90%+ (AuthContext)
-- [x] Documentação atualizada
+- [x] Testes unitários
+- [x] Cobertura de testes
+- [x] Documentação abrangente
 - [x] Clean Architecture
-- [x] Acessibilidade
-- [x] Responsividade
+- [x] Acessibilidade e responsividade
+- [x] Pipeline CI/CD documentado
+- [x] Cache service com TTL
+- [x] CRUD de repositórios
+- [x] Controllers para operações
 
 ---
 
-**Versão Atual:** 1.2.0  
-**Última Atualização:** 17 de Janeiro de 2026  
+**Versão Atual:** 1.2.0+  
+**Última Atualização:** Março de 2026  
 **Status:** ✅ Production Ready
+
+Para questões ou contribuições, consulte a documentação auxiliar nos arquivos `.md` da raiz do projeto.
